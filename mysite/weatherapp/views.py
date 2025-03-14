@@ -9,7 +9,12 @@ def index(request):
     if request.method == 'POST':
         city = request.POST['city']
 
-        source = urllib.request.urlopen('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=<API-KEY-GOES-HERE>').read()
+        try:
+            source = urllib.request.urlopen('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=<API-KEY-GOES-HERE>').read()
+            list_of_data = json.loads(source)
+        except urllib.error.HTTPError as e:
+            data = {"error": "City not found or API error."}
+            return render(request, "main/index.html", data)
         list_of_data = json.loads(source)
 
         data = {
@@ -24,7 +29,7 @@ def index(request):
             'description': str(list_of_data['weather'][0]['description']),
             'icon': list_of_data['weather'][0]['icon'],
         }
-        print(data)
+        print(data) 
     else:
         data = {}
 
